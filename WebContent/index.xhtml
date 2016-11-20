@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	template="/templates/jumbotron-template.xhtml">
+    
+    
+    <ui:define name="content">
+         <h:outputScript name="demo.js" library="js" />  
+  
+  
+  
+    
+<h:form id="form1">	
+
+
+		<p:growl id="growl" sticky="false" showDetail="true" life="2000" /> 
+				  
+				  <p:idleMonitor timeout="300000">
+                      <p:ajax event="idle" listener="#{headerBean.onIdle}" update=":form1:growl" />
+                      <p:ajax event="active" listener="#{headerBean.onActive}" update=":form1:growl" />
+                  </p:idleMonitor>
+  
+                  
+
+<div class="jumbotron">
+
+   <h1 id="msg" >
+       <script>document.appendChild(getMessage());</script>
+   </h1>
+        <p> Siamo una società di Consulenza e Ingegneria Informatica che opera nel mercato nazionale dal 1980, focalizzata sull'attività di progettazione, consulenza e formazione di sistemi chiavi in mano.
+        <br /> Dalle schede perforate al web… 30 anni di certificata esperienza in consulenza applicativa per banche, industria, commercio e Pubblica Amministrazione.</p>
+        <p><a class="btn btn-primary btn-lg" href="login.xhtml" role="button" title="Entra in Conselti">#{i18n.accedi} »</a></p>
+
+</div>
+
+
+
+</h:form>
+
+    </ui:define>
+
+
+
+</ui:composition>

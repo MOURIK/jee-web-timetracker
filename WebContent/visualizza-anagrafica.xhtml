@@ -1,0 +1,317 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	template="/templates/main-template.xhtml">
+	
+	
+	
+	
+<ui:define name="content">
+
+   <h:outputStylesheet library="css" name="demo.css"  />
+		
+		
+			<!-- Elenco anagrafiche dipendenti -->
+			<h:form id="form2">
+				
+				<p:growl id="messages" showDetail="true" sticky="false" life="2000"/>
+				
+				
+				<p:idleMonitor timeout="300000">
+                      <p:ajax event="idle" listener="#{headerBean.onIdle}" update=":form2:messages" />
+                      <p:ajax event="active" listener="#{headerBean.onActive}" update=":form2:messages" />
+                </p:idleMonitor>
+                
+                
+                
+				
+				 <p:panel header="Visualizza Anagrafica" id="panel" >
+				    				    
+
+
+				   <div class="table-responsive">
+						<p:dataTable var="object" 
+							    stickyHeader="true" 
+							    styleClass="et_datatable table-striped"
+							    style="width:auto; overflow:auto; table-layout: auto;"
+								value="#{anagraficaBean.anagrafiche}"
+								emptyMessage="Nessuna registrazione trovata" paginator="true" rows="10"
+								editable="true"
+								
+								selection="#{anagraficaBean.selectedAnagrafica}"
+								selectionMode="single"
+								sortOrder="ascending" 
+								rowKey="#{object.codiceFiscale}"
+								sortBy="#{object.codiceFiscale}"
+								
+								id="objects"
+								rowsPerPageTemplate="5,10,15,20"
+								paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}">
+
+
+                                <!-- Alla selezione della riga, attiva i Button Modifica e Cancella-->
+								<p:ajax event="rowSelect" update=":form2:" />
+								
+								
+								<f:facet name="header">
+                                         Elenco Anagrafiche
+                                </f:facet>
+
+
+                                <p:column sortBy="#{object.username}" id="username">
+									<f:facet name="header">
+									<h:outputText value="Username" />
+									</f:facet>
+									<h:outputText value="#{object.username}" />
+							    </p:column>
+
+							    
+							    <p:column sortBy="#{object.password}" id="password">
+									<f:facet name="header">
+									<h:outputText value="Password" />
+									</f:facet>
+									<h:outputText value="#{object.password}" />
+							    </p:column>
+
+
+								<p:column sortBy="#{object.codiceFiscale}" id="cf">
+								    <f:facet name="header">
+									<h:outputText value="Codice Fiscale" />
+									</f:facet>
+									<h:outputText value="#{object.codiceFiscale}" />
+							    </p:column>
+
+							    
+							    <p:column sortBy="#{object.nome}" id="nome">
+							        <f:facet name="header">
+									<h:outputText value="Nome" />
+									</f:facet>
+									<h:outputText value="#{object.nome}" />
+							    </p:column>
+
+							    
+							    <p:column sortBy="#{object.cognome}" id="cognome">
+							        <f:facet name="header">
+									<h:outputText value="Cognome" />
+									</f:facet>
+									<h:outputText value="#{object.cognome}" />
+							    </p:column>   
+							    
+							    
+							    <p:column sortBy="#{object.sesso}" id="sex">
+							        <f:facet name="header">
+									<h:outputText value="Sesso" />
+									</f:facet>
+									<h:outputText value="#{object.sesso}" />
+							    </p:column> 
+
+
+								<p:column sortBy="#{object.nascita}" id="nascita"
+									mask="99/99/9999">
+									<f:facet name="header">
+									<h:outputText value="Nato il" />
+									</f:facet>
+									<h:outputText value="#{object.nascita}">
+										<f:convertDateTime pattern="dd/MM/yyyy" />
+									</h:outputText>
+								</p:column> 
+
+																     
+								<p:column sortBy="#{object.email}" id="email">
+								    <f:facet name="header">
+									<h:outputText value="Email" />
+									</f:facet>
+                                    <h:outputText value="#{object.email}" />
+                                </p:column>
+
+
+                                <p:column sortBy="#{object.via}" id="via">
+                                    <f:facet name="header">
+									<h:outputText value="Via" />
+									</f:facet>
+                                    <h:outputText value="#{object.via}" />
+                                </p:column>  
+
+                                
+                                <p:column sortBy="#{object.cap}" id="cap">
+                                    <f:facet name="header">
+									<h:outputText value="CAP" />
+									</f:facet>
+                                    <h:outputText value="#{object.cap}" />
+                                </p:column>
+
+                                
+                                <p:column sortBy="#{object.city}" id="city">
+                                    <f:facet name="header">
+									<h:outputText value="Città" />
+									</f:facet>
+                                    <h:outputText value="#{object.city}" />
+                                </p:column>
+                                
+								 <p:column sortBy="#{object.cellulare}" id="cell">
+								    <f:facet name="header">
+									<h:outputText value="Telefono" />
+									</f:facet>
+									<h:outputText value="#{object.cellulare}"/>
+							    </p:column>
+
+
+
+
+								<f:facet name="footer">
+								<p:commandButton id="modifyButton" value="Modifica"
+										update=":form3:modalDialog"
+										disabled="#{empty anagraficaBean.selectedAnagrafica}"
+										icon="ui-icon-pencil" oncomplete="dlgmodifica.show()" />
+
+								<p:commandButton id="deleteButton" value="Cancella"
+								        rendered="#{request.isUserInRole('ROLE_ADMIN')}"
+										disabled="#{empty anagraficaBean.selectedAnagrafica}"
+										onclick="confirmation.show()" icon="ui-icon-close" />
+										
+								</f:facet>
+								
+						</p:dataTable> <!-- data table -->
+					</div>	
+
+
+
+
+
+					    <!-- Dialog per conferma cancellazione -->
+						<p:confirmDialog id="confirmDialog" resizable="false"
+								message="Confermi la cancellazione?" closeOnEscape="true"
+								hideEffect="clip" showEffect="clip" width="400" height="60"
+								header="Cancella" severity="alert"
+								widgetVar="confirmation">
+								
+								
+
+                            <p:outputPanel layout="block" style="text-align:center">
+                           
+								<p:commandButton id="confirm" value="Si" icon="ui-icon-check"
+									oncomplete="confirmation.hide()" 
+									actionListener="#{anagraficaBean.cancellaAnagrafica}"
+									update=":form2:objects, :form2:messages"/>
+
+								<p:commandButton id="decline" value="No" icon="ui-icon-close"
+									onclick="confirmation.hide()" type="button" />
+									
+							</p:outputPanel>
+							
+							
+							
+							
+						</p:confirmDialog> <!-- conferma cancellazione -->
+					</p:panel>
+                </h:form> <!-- form data table -->
+                        
+					
+						
+						
+<h:form id="form4">  <!-- form esporta tabella -->
+
+<p:panel header="Esporta la Tabella" style="margin-top: 10px;">
+
+    <h:commandLink id="xls">
+        <p:graphicImage url="/resources/imgs/excel.png" alt="xls" title="Esporta in XLS"/>
+        <p:dataExporter type="xls" target=":form2:objects" fileName="elenco_anagrafica" encoding="UTF-8" postProcessor="#{exporterBean.postProcessXLS}"/>
+    </h:commandLink>
+    
+    <p:spacer width="20"/> 
+ 
+    <h:commandLink id="pdf">
+        <p:graphicImage url="/resources/imgs/pdf.png" alt="pdf" title="Esporta in PDF"/>
+        <p:dataExporter type="pdf" target=":form2:objects" fileName="elenco_anagrafica" encoding="UTF-8" preProcessor="#{exporterBean.preProcessPDF}"/>
+    </h:commandLink>
+    
+    <p:spacer width="20"/> 
+ 
+    <h:commandLink id="csv">
+        <p:graphicImage url="/resources/imgs/csv.png" alt="csv" title="Esporta in CSV"/>
+        <p:dataExporter type="csv" target=":form2:objects" fileName="elenco_anagrafica" encoding="UTF-8"/>
+    </h:commandLink>
+    
+    <p:spacer width="20"/> 
+ 
+    <h:commandLink id="xml">
+        <p:graphicImage url="/resources/imgs/xml.png" alt="xml" title="Esporta in XML"/>
+        <p:dataExporter type="xml" target=":form2:objects" fileName="elenco_anagrafica" encoding="UTF-8"/>
+    </h:commandLink>
+    
+</p:panel>
+
+</h:form>  <!-- form esporta tabella -->
+
+                   
+
+
+					<!-- Dialog al pressing del button Modifica elenco -->
+						
+
+					<h:form id="form3">  <!-- form di dialog modifica -->
+					   
+							<p:dialog id="modalDialog" header="Modifica" resizable="false"
+								showEffect="clip" hideEffect="clip" 
+								widgetVar="dlgmodifica" width="750" height="400" closeOnEscape="true"
+								modal="true">
+								
+						   <h:panelGrid id="display" columns="2" cellpadding="4" style="margin:0 auto;">
+								    
+								    
+								    <h:outputText value="Password " for="pwd1" style="padding-left: 30px; padding-right: 30px;"/>
+									<p:inputText id="pwd1" value="#{anagraficaBean.selectedAnagrafica.password}" 
+									required="true" requiredMessage="Password obbligatoria"/>
+									
+								    							
+									<h:outputText value="Email " style="padding-left: 30px; padding-right: 30px;"/>
+									<p:inputMask value="#{anagraficaBean.selectedAnagrafica.email}" requiredMessage="Email obbligatoria"
+									required="true" validatorMessage="L'email non ha caratteri validi">
+									   <f:validateRegex pattern="[\w\.-]*[a-zA-Z0-9_]@[\w\.-]*[a-zA-Z0-9]\.[a-zA-Z][a-zA-Z\.]*[a-zA-Z]" />
+									</p:inputMask>
+									
+										<h:outputText value="Via " style="padding-left: 30px; padding-right: 30px;"/>
+									<p:inputMask value="#{anagraficaBean.selectedAnagrafica.via}" />
+									
+										<h:outputText value="CAP " style="padding-left: 30px; padding-right: 30px;"/>
+									<p:inputMask value="#{anagraficaBean.selectedAnagrafica.cap}" mask="99999" />
+									
+										<h:outputText value="Città " style="padding-left: 30px; padding-right: 30px;"/>
+									<p:inputMask value="#{anagraficaBean.selectedAnagrafica.city}" required="true" requiredMessage="Città obbligatoria"/>
+									
+										<h:outputText value="Telefono " style="padding-left: 30px; padding-right: 30px;"/>
+									<p:inputMask value="#{anagraficaBean.selectedAnagrafica.cellulare}" mask="(999) 999-9999" />
+
+                           </h:panelGrid>
+                          
+                          
+                                <p:outputPanel layout="block" style="text-align:center">
+                                    <br />
+						            <br />
+									
+									
+									<p:commandButton value="Annulla" type="reset"
+										onclick="dlgmodifica.hide()" 
+										icon=" ui-icon-arrowreturnthick-1-w" />
+										
+										
+										<p:spacer width="10"/> 
+
+
+									<p:commandButton value="#{i18n.salva}" icon="ui-icon-disk"
+										actionListener="#{anagraficaBean.modificaAnagrafica}"
+										oncomplete="dlgmodifica.hide()" update=":form2:objects, :form2:messages"/>
+
+                                </p:outputPanel>
+                         
+
+						</p:dialog>
+					</h:form> <!-- form di dialog modifica -->
+						
+              
+</ui:define>
+</ui:composition>

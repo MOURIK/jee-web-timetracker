@@ -1,0 +1,465 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	template="/templates/main-template.xhtml">
+    
+    
+		   
+<ui:define name="content">
+
+    <h:outputStylesheet library="css" name="demo.css"  />
+		
+              
+              
+		<h:form id="form1"> <!-- form di inserimento -->
+						
+			<p:growl id="growl" sticky="false" showDetail="true" life="2000"/>	
+					
+					
+				<p:idleMonitor timeout="300000">
+                      <p:ajax event="idle" listener="#{headerBean.onIdle}" update=":form1:growl" />
+                      <p:ajax event="active" listener="#{headerBean.onActive}" update=":form1:growl" />
+                </p:idleMonitor>
+				
+				
+				
+					
+				<p:panel header="Inserimento Registrazione" id="panel"> <!-- panel form -->	
+						
+							   
+						      	<p:messages id="msgs" closable="true" showDetail="true"/>
+							  
+							  
+							  
+							  <br/>	 
+							   
+							<h:panelGrid id="view" columns="2" cellpadding="4">
+									
+                            
+									<h:outputText value="Data Odierna "  for="mask" style="padding-left: 30px; padding-right: 30px;"/>
+									<p:calendar id="mask" value="#{registrazioneBean.registrazione.data}" pattern="dd/MM/yyyy" effect="fold" 
+									 required="true" label="Data Odierna" requiredMessage="Data Odierna obbligatoria">
+									 <!-- showOn="button" -->
+									        
+									 <f:convertDateTime pattern="dd/MM/yyyy" />
+									 </p:calendar>
+									 
+									
+									
+									<h:outputText value="Ore Lavorate " for="lavorate" style="padding-left: 30px; padding-right: 30px;"/>
+									<p:inputText value="#{registrazioneBean.registrazione.lavorate}" id="lavorate" label="Ore Lavorate">
+										 <f:validateDoubleRange minimum="1"  />
+									</p:inputText>
+									 
+									
+									<h:outputText value="Ferie " for="ferie" style="padding-left: 30px; padding-right: 30px;"/>
+									<p:inputText value="#{registrazioneBean.registrazione.ferie}" id="ferie" label="Ferie" >
+										 <f:validateDoubleRange minimum="1"  />
+									</p:inputText>
+									
+									
+									<!-- rendered="#{registrazioneBean.registrazione.permesso} != null and #{registrazioneBean.registrazione.permesso} != 0" -->
+									<h:outputText value="Permesso " for="permesso" style="padding-left: 30px; padding-right: 30px;"/>
+									<p:inputText value="#{registrazioneBean.registrazione.permesso}" id="permesso" label="Permesso">
+										 <f:validateDoubleRange minimum="1"  />
+									</p:inputText>
+									
+									
+									<h:outputText value="Malattia " for="malattia" style="padding-left: 30px; padding-right: 30px;"/>
+									<p:inputText value="#{registrazioneBean.registrazione.malattia}" id="malattia" label="Malattia">
+										 <f:validateDoubleRange minimum="1"  />
+									</p:inputText>
+									
+									<!-- rendered="#{registrazioneBean.registrazione.trasferta} != null and #{registrazioneBean.registrazione.trasferta} != 0" -->
+									<h:outputText value="Trasferta " for="trasferta" style="padding-left: 30px; padding-right: 30px;"/>
+									<p:inputText value="#{registrazioneBean.registrazione.trasferta}" id="trasferta" label="trasferta">
+										 <f:validateDoubleRange minimum="1"  />
+									</p:inputText>
+
+                                  
+                                
+									<h:outputLabel for="note" value="Note " style="padding-left: 30px; padding-right: 30px;"/>
+									
+									<p:inputTextarea rows="5" cols="30" id="note" counter="display"
+										maxlength="100" counterTemplate="{0} characters remaining."
+										autoResize="true" value="#{registrazioneBean.registrazione.note}" />
+										<br/>
+									<h:outputText id="display" style="margin: 0 auto"/>
+									
+							</h:panelGrid>
+						  
+						   
+						   
+						     <h:panelGrid columns="2" cellpadding="4" >
+
+
+                             
+                              <p:outputPanel layout="block" style="text-align:center">
+							       <br />
+							       <br />
+                             
+
+							    <p:commandButton value="Reset" process="@this" style="margin-left: 30px;"
+									icon="ui-icon-close" update=":form1:panel" actionListener="#{registrazioneBean.reset}" >
+								</p:commandButton>
+									
+									
+									<p:spacer width="10"/> 
+									
+									
+ 							        <p:commandButton value="#{i18n.salva}" icon="ui-icon-disk"
+										actionListener="#{registrazioneBean.inserisciRegistrazione}"
+										update=":form1:growl, :form1:panel, :form1:msgs, :form2:tabella_inserimento"
+										validateClient="true" type="submit">
+							        </p:commandButton>
+				 			        
+							        
+							   </p:outputPanel>     
+							        
+							        
+							</h:panelGrid>
+							
+                        </p:panel> <!-- panel form -->
+                        
+				 </h:form> <!-- form di inserimento -->
+				 
+				 
+				 
+	 <h:form id="form2" style="margin-top: 10px;">
+
+       <div class="table-responsive">
+          <p:dataTable var="object"
+            stickyHeader="true"
+            styleClass="et_datatable table-striped"
+            id="tabella_inserimento"
+            value="#{registrazioneBean.registrazioni}"
+            emptyMessage="Nessuna registrazione trovata" paginator="true" rows="25"
+            style="width:auto; table-layout: auto;"
+            
+            selection="#{registrazioneBean.selectedRegistrazione}"
+            rowKey="#{object.id}"
+            selectionMode="single"
+            
+            editable="true"
+            rowsPerPageTemplate="10,25,30,40,50"
+            paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+            filteredValue="#{registrazioneBean.filteredRegistrazione}">
+
+
+            <!-- alla selezione della riga, attiva i button Modifica e Cancella-->
+            <p:ajax event="rowSelect" update=":form2:" />
+
+
+                            <f:facet name="header">
+                                     Elenco Registrazioni
+                            </f:facet>
+
+
+              <p:column filterBy="#{object.cognome}" filterMatchMode="contains"
+              sortBy="#{object.cognome}" id="cognome">
+              <f:facet name="header">
+              <h:outputText value="Cognome" />
+              </f:facet>
+              <h:outputText value="#{object.cognome}" />
+              </p:column>
+              
+              
+              <p:column filterBy="#{object.nome}" filterMatchMode="contains"
+              sortBy="#{object.nome}" id="nome" rendered="#{request.isUserInRole('ROLE_ADMIN')}">
+              <f:facet name="header">
+              <h:outputText value="Nome" />
+              </f:facet>
+              <h:outputText value="#{object.nome}" />
+              </p:column>
+              
+
+
+
+            <p:column filterBy="#{object.data}" filterMatchMode="contains"
+              sortBy="#{object.data}" id="data"
+              mask="99/99/9999">
+              <f:facet name="header">
+              <h:outputText value="Data" />
+              </f:facet>
+              <h:outputText value="#{object.data}">
+                <f:convertDateTime pattern="dd/MM/yyyy" />
+              </h:outputText>
+            </p:column>
+
+
+
+            <p:column sortBy="#{object.lavorate}" id="ore-lavorate"
+            filterMatchMode="contains" filterBy="#{object.lavorate}">
+              <f:facet name="header">
+              <h:outputText value="Ore Lavorate" />
+              </f:facet>
+              <h:outputText value="#{object.lavorate}" rendered="#{object.lavorate != null and object.lavorate != 0}"/>
+            </p:column>
+
+
+            <p:column sortBy="#{object.ferie}" id="ore-ferie"
+            filterMatchMode="contains" filterBy="#{object.ferie}">
+              <f:facet name="header">
+              <h:outputText value="Ferie" />
+              </f:facet>
+              <h:outputText value="#{object.ferie}" rendered="#{object.ferie != null and object.ferie != 0}"/>
+            </p:column>
+
+
+            <p:column sortBy="#{object.permesso}" id="ore-permesso"
+            filterMatchMode="contains" filterBy="#{object.permesso}">
+              <f:facet name="header">
+              <h:outputText value="Permesso" />
+              </f:facet>
+              <h:outputText value="#{object.permesso}" rendered="#{object.permesso != null and object.permesso != 0}"/>
+            </p:column>
+
+
+            <p:column sortBy="#{object.malattia}" id="ore-malattia"
+            filterMatchMode="contains" filterBy="#{object.malattia}">
+              <f:facet name="header">
+              <h:outputText value="Malattia" />
+              </f:facet>
+              <h:outputText value="#{object.malattia}" rendered="#{object.malattia != null and object.malattia != 0}"/>
+            </p:column>
+
+
+            <p:column sortBy="#{object.trasferta}" id="ore-trasferta"
+            filterMatchMode="contains" filterBy="#{object.trasferta}">
+              <f:facet name="header">
+              <h:outputText value="Trasferta" />
+              </f:facet>
+              <h:outputText value="#{object.trasferta}" rendered="#{object.trasferta != null and object.trasferta != 0}"/>
+            </p:column>
+
+
+            <p:column sortBy="#{object.note}" id="note">
+              <f:facet name="header">
+              <h:outputText value="Note" />
+              </f:facet>
+              <h:outputText value="#{object.note}" />
+            </p:column>
+
+
+
+                            <!-- Button cancella -->
+            <p:column style="width:8%" exportable="false"
+            rendered="#{request.isUserInRole('ROLE_ADMIN')}" headerText="Cancella">
+
+              <p:commandLink id="selectButton" process="@this"
+                action="#{registrazioneBean.cancellaRegistrazione}"
+                update=":form2:tabella_inserimento, :form1:msgs, :form1:growl"
+                 image="ui-icon ui-icon-close" title="Cancella">
+                <f:setPropertyActionListener value="#{object}"
+                  target="#{registrazioneBean.selectedRegistrazione}" />
+
+                  <h:outputText styleClass="ui-icon ui-icon-close" style="margin: 0 auto;"/>
+
+              </p:commandLink>
+
+            </p:column>
+
+
+
+            <!-- Button Modifica -->
+             <p:column style="width:8%" exportable="false" headerText="Modifica">
+
+              <p:commandLink id="selButton" process="@this"
+                update=":form3:modalDialog" oncomplete="dlgmodifica.show()"
+                 image="ui-icon ui-icon-pencil" title="Modifica">
+
+                <f:setPropertyActionListener value="#{object}"
+                  target="#{registrazioneBean.selectedRegistrazione}" />
+
+                  <h:outputText styleClass="ui-icon ui-icon-pencil" style="margin: 0 auto;"/>
+
+              </p:commandLink>
+
+            </p:column>
+
+
+
+
+
+                            <!-- Buttons datatable -->
+            <f:facet name="footer">
+            <p:commandButton id="modifyButton" value="Modifica"
+                update=":form3:modalDialog"
+                disabled="#{empty registrazioneBean.selectedRegistrazione}"
+                icon="ui-icon-pencil" oncomplete="dlgmodifica.show()" />
+
+            <p:commandButton id="deleteButton" value="Cancella"
+                    rendered="#{request.isUserInRole('ROLE_ADMIN')}"
+                disabled="#{empty registrazioneBean.selectedRegistrazione}"
+                onclick="confirmation.show()" icon="ui-icon-close" />
+
+            </f:facet>
+        </p:dataTable>
+
+       </div>
+
+
+
+
+
+
+
+
+          <!-- Dialog per conferma cancellazione -->
+      <p:confirmDialog id="confirmDialog" resizable="false" closeOnEscape="true"
+            message="Confermi la cancellazione?" width="400" height="60"
+            showEffect="clip" hideEffect="clip"
+            header="Cancella" severity="alert"
+            widgetVar="confirmation">
+
+                         <p:outputPanel layout="block" style="text-align:center">
+
+            <p:commandButton id="confirm" value="Si " icon="ui-icon-check"
+              oncomplete="confirmation.hide()"
+              actionListener="#{registrazioneBean.cancellaRegistrazione}"
+              update=":form2:tabella_inserimento, :form1:msgs, :form1:growl" />
+
+
+
+            <p:commandButton id="decline" value="No" icon="ui-icon-close"
+              onclick="confirmation.hide()" type="button" />
+
+           </p:outputPanel>
+
+      </p:confirmDialog> <!-- conferma cancellazione -->
+
+
+         </h:form> <!-- form tabella -->
+
+
+
+
+<h:form id="form4">
+
+<p:panel header="Esporta la Tabella" style="margin-top: 10px;">
+
+<h:commandLink id="xls">
+    <p:graphicImage url="/resources/imgs/excel.png" alt="xls" title="Esporta in XLS"/>
+    <p:dataExporter type="xls" target=":form2:tabella_inserimento" fileName="marcatempo_registrazioni"
+    encoding="UTF-8" postProcessor="#{exporterBean.postProcessXLS}"/>
+</h:commandLink>
+
+<p:spacer width="20"/>
+
+<h:commandLink id="pdf">
+    <p:graphicImage url="/resources/imgs/pdf.png" alt="pdf" title="Esporta in PDF"/>
+    <p:dataExporter type="pdf" target=":form2:tabella_inserimento" fileName="marcatempo_registrazioni"
+    encoding="UTF-8" preProcessor="#{exporterBean.preProcessPDF}"/>
+</h:commandLink>
+
+<p:spacer width="20"/>
+
+<h:commandLink id="csv">
+    <p:graphicImage url="/resources/imgs/csv.png" alt="csv" title="Esporta in CSV"/>
+    <p:dataExporter type="csv" target=":form2:tabella_inserimento" fileName="marcatempo_registrazioni" encoding="UTF-8"/>
+</h:commandLink>
+
+<p:spacer width="20"/>
+
+<h:commandLink id="xml">
+    <p:graphicImage url="/resources/imgs/xml.png" alt="xml" title="Esporta in XML"/>
+    <p:dataExporter type="xml" target=":form2:tabella_inserimento" fileName="marcatempo_registrazioni" encoding="UTF-8"/>
+</h:commandLink>
+
+</p:panel>
+
+</h:form>
+
+
+
+
+
+
+        <!-- Dialog al pressing del button Modifica elenco -->
+      <h:form id="form3"> <!-- form di modifica js -->
+
+            <p:dialog id="modalDialog" header="Modifica" resizable="false"
+              showEffect="clip" hideEffect="clip" width="750" height="400"
+              widgetVar="dlgmodifica" modal="true" closeOnEscape="true">
+
+       <h:panelGrid  id="dialog"
+            columns="2" cellpadding="4" style="margin:0 auto;">
+
+              <h:outputText value="Data Odierna " style="padding-left: 30px; padding-right: 30px;"/>
+                <p:inputMask 
+                  value="#{registrazioneBean.selectedRegistrazione.data}"
+                  mask="99/99/9999" label="Data odierna" required="true" requiredMessage="Data Odierna obbligatoria">
+                  <f:convertDateTime pattern="dd/MM/yyyy" />
+              </p:inputMask>
+
+
+              <h:outputText value="Ore Lavorate " style="padding-left: 30px; padding-right: 30px;"/>
+              <p:inputMask label="Ore Lavorate" 
+                value="#{registrazioneBean.selectedRegistrazione.lavorate}" >
+                 <f:validateDoubleRange minimum="1"  />
+              </p:inputMask>
+
+
+              <h:outputText value="Ferie " style="padding-left: 30px; padding-right: 30px;"/>
+              <p:inputMask label="Ferie" 
+                value="#{registrazioneBean.selectedRegistrazione.ferie}" >
+                <f:validateDoubleRange minimum="1"  />
+              </p:inputMask>
+
+                <h:outputText value="Permesso" style="padding-left: 30px; padding-right: 30px;"/>
+              <p:inputMask label="Permesso" 
+                value="#{registrazioneBean.selectedRegistrazione.permesso}" >
+                <f:validateDoubleRange minimum="1"  />
+              </p:inputMask>
+
+              <h:outputText value="Malattia " style="padding-left: 30px; padding-right: 30px;"/>
+              <p:inputMask label="Malattia" 
+                value="#{registrazioneBean.selectedRegistrazione.malattia}" >
+                <f:validateDoubleRange minimum="1"  />
+              </p:inputMask>
+
+              <h:outputText value="Trasferta " style="padding-left: 30px; padding-right: 30px;"/>
+              <p:inputMask label="Trasferta" 
+                value="#{registrazioneBean.selectedRegistrazione.trasferta}" >
+                <f:validateDoubleRange minimum="1"  />
+              </p:inputMask>
+
+
+              <h:outputText value="Note " style="padding-left: 30px; padding-right: 30px;"/>
+              <p:inputMask label="Note"
+                value="#{registrazioneBean.selectedRegistrazione.note}" />
+
+       </h:panelGrid>
+                   <p:outputPanel layout="block" style="text-align:center">
+                   <br />
+                   <br />
+
+                <p:commandButton value="Annulla" type="button"
+                onclick="dlgmodifica.hide()"
+                icon=" ui-icon-arrowreturnthick-1-w" />
+
+
+               <p:spacer width="10"/>
+
+
+                <p:commandButton value="#{i18n.salva}" icon="ui-icon-disk"
+                actionListener="#{registrazioneBean.modificaRegistrazione}"
+                oncomplete="dlgmodifica.hide()" update=":form2:tabella_inserimento, :form1:msgs, :form1:growl"/>
+
+               </p:outputPanel>
+
+
+
+
+          </p:dialog>
+
+           </h:form>  <!-- form di modifica js -->
+				 
+				 
+	</ui:define>
+	
+</ui:composition>

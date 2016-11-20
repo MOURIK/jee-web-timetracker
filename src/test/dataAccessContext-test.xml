@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:context="http://www.springframework.org/schema/context" 
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:p="http://www.springframework.org/schema/p" 
+	xmlns:util="http://www.springframework.org/schema/util"
+	xmlns:jpa="http://www.springframework.org/schema/data/jpa"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+		  http://www.springframework.org/schema/data/jpa http://www.springframework.org/schema/data/jpa/spring-jpa.xsd
+		  http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.1.xsd
+          http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.0.xsd
+          http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.0.xsd
+          http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.1.xsd">
+
+
+
+
+	<bean id="dataSource" parent="poolDataSourceParent">
+		<property name="jdbcUrl" value="#{jdbcProperties['jdbc.url']}" />
+		<property name="user" value="#{jdbcProperties['jdbc.username']}" />
+		<property name="password" value="#{jdbcProperties['jdbc.password']}" />
+	</bean>
+	
+	
+
+	<util:properties id="jdbcProperties" location="classpath:test/jdbc.properties" />
+
+
+
+
+	<!-- Datasource, pool and cache -->
+	<bean id="poolDataSourceParent" class="com.mchange.v2.c3p0.ComboPooledDataSource">
+		<property name="driverClass" value="#{jdbcProperties['jdbc.driverClassName']}" />
+
+		<property name="initialPoolSize" value="#{jdbcProperties['c3p0.initialPoolSize']}" />
+		<property name="minPoolSize" value="#{jdbcProperties['c3p0.minPoolSize']}" />
+		<property name="maxPoolSize" value="#{jdbcProperties['c3p0.maxPoolSize']}" />
+		<property name="acquireRetryAttempts"
+			value="#{jdbcProperties['c3p0.acquireRetryAttempts']}" />
+		<property name="acquireIncrement" value="#{jdbcProperties['c3p0.acquireIncrement']}" />
+		<property name="idleConnectionTestPeriod"
+			value="#{jdbcProperties['c3p0.idleConnectionTestPeriod']}" />
+		<property name="maxIdleTime" value="#{jdbcProperties['c3p0.maxIdleTime']}" />
+		<property name="maxConnectionAge" value="#{jdbcProperties['c3p0.maxConnectionAge']}" />
+		<property name="preferredTestQuery" value="#{jdbcProperties['c3p0.preferredTestQuery']}" />
+		<property name="testConnectionOnCheckin"
+			value="#{jdbcProperties['c3p0.testConnectionOnCheckin']}" />
+	</bean>
+
+
+	
+	
+	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource" ref="dataSource" />
+		<property name="typeAliasesPackage" value="it.conselti.domain" />
+		<property name="configLocation" value="classpath:test/myBatisConfig-test.xml" />
+	</bean>
+
+
+
+	
+	<bean id="mapperScanner" class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+		<property name="basePackage" value="it.conselti.repository" />
+		<property name="sqlSessionFactory" ref="sqlSessionFactory" />
+	</bean>	
+
+
+
+
+	<bean id="transactionManager"
+		class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+
+
+	
+	<tx:annotation-driven transaction-manager="transactionManager" proxy-target-class="true" />
+	
+	
+	
+</beans>

@@ -1,0 +1,560 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	template="/templates/main-template.xhtml">
+	
+
+
+<ui:define name="content">
+				 
+		 <h:outputStylesheet library="css" name="demo.css"  />		 
+				 
+				 
+		    <!-- Visualizzazione registrazioni utenti --> 
+			<h:form id="form1">
+				     
+				     <p:growl id="messages" sticky="false" showDetail="true" life="2000"/>	
+				     
+				     
+				<p:idleMonitor timeout="300000">
+                      <p:ajax event="idle" listener="#{headerBean.onIdle}" update=":form1:messages" />
+                      <p:ajax event="active" listener="#{headerBean.onActive}" update=":form1:messages" />
+                </p:idleMonitor>
+                
+                
+                
+                
+				     
+				     
+				 <p:panel header="Visualizza Registrazioni" id="panel" >
+				     
+				      <br/>
+				       
+								<h:panelGrid columns="3" cellpadding="4">
+								
+								    <h:outputText value="Cognome " for="surname" style="padding-left: 30px; padding-right: 30px;"/>
+									<p:inputMask id="surname" value="#{visualizzaRegistrazioneBean.visualizza.cognome}" 
+									disabled="#{request.isUserInRole('ROLE_USER')}">
+										<f:validateLength minimum="3" />
+									</p:inputMask>
+									<p:message for="surname" autoUpdate="true"/>
+
+										
+									<h:outputText value="Nome " for="name" style="padding-left: 30px; padding-right: 30px;"/>
+									<p:inputMask id="name" value="#{visualizzaRegistrazioneBean.visualizza.nome}" 
+									disabled="#{request.isUserInRole('ROLE_USER')}">
+									    <f:validateLength minimum="3" />
+									</p:inputMask>
+									<p:message for="name" autoUpdate="true"/>    
+
+
+									<h:outputText value="Dal giorno " for="from" style="padding-left: 30px; padding-right: 30px;"/>
+									<p:calendar id="from" value="#{visualizzaRegistrazioneBean.visualizza.dateFrom}" pattern="dd/MM/yyyy" 
+									 required="true" effect="fold" requiredMessage="Dal giorno obbligatorio">
+									<f:convertDateTime pattern="dd/MM/yyyy" />
+									       <p:ajax event="dateSelect" update=":form1:to" />
+									 </p:calendar>
+									 <p:message for="from" autoUpdate="true"/>
+
+									 
+									 <h:outputText value="Al giorno " for="to" style="padding-left: 30px; padding-right: 30px;"/>
+									 <p:calendar id="to" value="#{visualizzaRegistrazioneBean.visualizza.dateTo}" pattern="dd/MM/yyyy" 
+									 required="true" effect="fold" mindate="#{visualizzaRegistrazioneBean.visualizza.dateFrom}"
+									 requiredMessage="Al giorno obbligatorio">
+									 <f:convertDateTime pattern="dd/MM/yyyy" />
+									 </p:calendar>
+									 <p:message for="to" autoUpdate="true"/>
+									 
+
+							     </h:panelGrid>
+							
+                                      
+                            <h:panelGrid columns="2" cellpadding="4">
+                            	
+                            	
+                            	<p:outputPanel layout="block" style="text-align:center">
+							       <br />
+							       <br />
+                               
+									<p:commandButton value="Reset" style="margin-left:30px;" actionListener="#{registrazioneBean.reset}"
+									    process="@this" icon="ui-icon-close" update="form1:panel">
+									</p:commandButton>
+									
+									<p:spacer width="10"/> 
+									
+									<!-- rendered="#{empty visualizzaRegistrazioneBean.selectedVisualizza}" -->
+									<p:commandButton value="#{i18n.cerca}" icon="ui-icon-search" type="submit"
+										actionListener="#{visualizzaRegistrazioneBean.ricercaTabella}" 
+										update=":form2:tabella_visualizza, :form1:panel, :form1:messages" validateClient="true">
+									</p:commandButton>
+									
+								</p:outputPanel>
+									
+									
+									
+                            </h:panelGrid>
+				      		  
+						 </p:panel>  
+				</h:form>
+				     
+				     
+				          
+				      <h:form id="form2" style="margin-top:10px;">
+				          
+				      <div class="table-responsive"> 
+							<p:dataTable var="object" 
+							    styleClass="et_datatable table-striped"
+							    id="tabella_visualizza"
+							    stickyHeader="true" 
+								value="#{visualizzaRegistrazioneBean.visualizzazioni}"
+								emptyMessage="Nessuna registrazione trovata" paginator="true" rows="25"
+								editable="true" 
+								
+								
+								selection="#{visualizzaRegistrazioneBean.selectedVisualizza}"
+								selectionMode="single"
+								rowKey="#{object.codiceUtente}"
+								rowsPerPageTemplate="10,25,30,40,50"
+								
+								style="width:auto; table-layout: auto;"
+								
+								paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+								filteredValue="#{visualizzaRegistrazioneBean.filteredVisualizza}">
+
+
+
+
+                                <!-- ajax event handler-->
+								<p:ajax event="rowSelect" update=":form2:tabella_visualizza, :form3:tabella_dialogo" 
+								oncomplete="showRegistrazDialog.show()" process="@this" 
+								listener="#{visualizzaRegistrazioneBean.populateDialogRegistrazioni}"/>
+
+
+								
+								
+								
+								
+								<f:facet name="header">
+                                              Elenco Registrazioni
+                                </f:facet>
+                                
+                                
+                                
+                                <p:column id="cognome" sortBy="#{object.cognome}" style="text-align:center">
+                                    <f:facet name="header">
+									<h:outputText value="Cognome" />
+									</f:facet>
+									
+									<h:outputText value="#{object.cognome}" />
+									
+									<f:facet name="footer">
+									  <h:outputLabel value="Totale (ore/giorni) " />
+									</f:facet>
+                                </p:column>
+                                
+                                
+                                
+                                
+                                <p:column id="nome" sortBy="#{object.nome}" style="text-align:center">
+                                    <f:facet name="header">
+                                    
+									<h:outputText value="Nome" />
+									</f:facet>
+									
+									<h:outputText value="#{object.nome}" />
+                                </p:column>
+                                
+                                
+                                
+                                
+                               <p:column sortBy="#{object.totaleLavorate}" id="tot-lavorate" style="text-align:center">
+                                  <f:facet name="header">
+                                        <h:outputText value="Totale Lavorate (HH/gg)" />
+                                  </f:facet>
+
+                                  <h:outputText value="#{object.totaleLavorate}" rendered="#{object.totaleLavorate != null and object.totaleLavorate != 0}"/>
+                                  <h:outputText value=" / " rendered="#{object.totaleLavorate != null and object.totaleLavorate != 0}"/>
+                                  <h:outputText value="#{object.totaleLavorate/8}" rendered="#{object.totaleLavorate != null and object.totaleLavorate != 0}"> 
+                                      <f:convertNumber pattern="#0.00"/>
+                                  </h:outputText>
+                                  
+                                  
+                                   <f:facet name="footer">
+                                      <h:outputLabel value="#{visualizzaRegistrazioneBean.footerTotaleLavorate} / #{visualizzaRegistrazioneBean.footerTotaleLavorate/8}"/>
+                                      <!-- <h:outputLabel value="#{visualizzaRegistrazioneBean.footerTotaleLavorate} / #{visualizzaRegistrazioneBean.footerTotaleLavorate/8}" 
+                                      rendered="#{visualizzaRegistrazioneBean.footerTotaleLavorate != null and visualizzaRegistrazioneBean.footerTotaleLavorate != 0}"/> -->
+                                      <!-- <h:outputLabel value=" / " rendered="#{visualizzaRegistrazioneBean.footerTotaleLavorate != null and visualizzaRegistrazioneBean.footerTotaleLavorate != 0}"/> -->
+                                     
+                                    <!--   <h:outputLabel value="#{visualizzaRegistrazioneBean.footerTotaleLavorate/8}" rendered="#{visualizzaRegistrazioneBean.footerTotaleLavorate != null and visualizzaRegistrazioneBean.footerTotaleLavorate != 0}" > 
+                                         <f:convertNumber pattern="#0.00"/>
+                                      </h:outputLabel> -->
+                                  
+                                </f:facet>
+                              </p:column>
+                              
+                              
+                              
+                              
+                               <p:column sortBy="#{object.totaleFerie}" id="tot-ferie" style="text-align:center">
+                                  <f:facet name="header">
+                                        <h:outputText value="Totale Ferie (HH/gg)" />
+                                  </f:facet>
+                                  
+                                  <h:outputText value="#{object.totaleFerie}" rendered="#{object.totaleFerie != null and object.totaleLavorate != 0}" />
+                                  <h:outputText value=" / " rendered="#{object.totaleFerie != null and object.totaleFerie != 0}"/>
+                                  <h:outputText value="#{object.totaleFerie/8}" rendered="#{object.totaleFerie != null and object.totaleFerie != 0}"> 
+                                      <f:convertNumber pattern="#0.00"/>
+                                  </h:outputText>
+                                  
+                                  
+                                   <f:facet name="footer">
+                                   <h:outputLabel value="#{visualizzaRegistrazioneBean.footerTotaleFerie} / #{visualizzaRegistrazioneBean.footerTotaleFerie/8}"/>
+
+                                     <!--  <h:outputLabel value="#{visualizzaRegistrazioneBean.footerTotaleFerie} / #{visualizzaRegistrazioneBean.footerTotaleFerie/8}" 
+                                      rendered="#{visualizzaRegistrazioneBean.footerTotaleFerie != null and visualizzaRegistrazioneBean.footerTotaleFerie != 0}" />
+                                     <<h:outputLabel value=" / " rendered="#{visualizzaRegistrazioneBean.footerTotaleFerie != null and visualizzaRegistrazioneBean.footerTotaleFerie != 0}" />
+                                      
+                                      <h:outputLabel value="#{visualizzaRegistrazioneBean.footerTotaleFerie/8}" rendered="#{visualizzaRegistrazioneBean.footerTotaleFerie != null and visualizzaRegistrazioneBean.footerTotaleFerie != 0}" > 
+                                         <f:convertNumber pattern="#0.00"/>
+                                      </h:outputLabel>  -->
+                                      
+                                </f:facet>
+                              </p:column>
+
+
+
+
+                              <p:column sortBy="#{object.totalePermesso}" id="tot-permesso" style="text-align:center">
+                                  <f:facet name="header">
+                                      <h:outputText value="Totale Permesso (HH/gg)" />
+                                  </f:facet>
+                                  
+                                  <h:outputText value="#{object.totalePermesso}" rendered="#{object.totalePermesso != null and object.totalePermesso != 0}" />
+                                  <h:outputText value=" / " rendered="#{object.totalePermesso != null and object.totalePermesso != 0}"/>
+                                  <h:outputText value="#{object.totalePermesso/8}" rendered="#{object.totalePermesso != null and object.totalePermesso != 0}"> 
+                                      <f:convertNumber pattern="#0.00"/>
+                                  </h:outputText>
+                                  
+                                  
+                                   <f:facet name="footer">
+                                   <h:outputLabel value="#{visualizzaRegistrazioneBean.footerTotalePermesso} / #{visualizzaRegistrazioneBean.footerTotalePermesso/8}"/>
+                                   
+                                      <!-- <h:outputLabel value="#{visualizzaRegistrazioneBean.footerTotalePermesso} / #{visualizzaRegistrazioneBean.footerTotalePermesso/8}"  
+                                      rendered="#{visualizzaRegistrazioneBean.footerTotalePermesso != null and visualizzaRegistrazioneBean.footerTotalePermesso != 0}" />
+                                      <h:outputLabel value=" / "  rendered="#{visualizzaRegistrazioneBean.footerTotalePermesso != null and visualizzaRegistrazioneBean.footerTotalePermesso != 0}" />
+                                      <h:outputLabel value="#{visualizzaRegistrazioneBean.footerTotalePermesso/8}" rendered="#{visualizzaRegistrazioneBean.footerTotalePermesso != null and visualizzaRegistrazioneBean.footerTotalePermesso != 0}" > 
+                                         <f:convertNumber pattern="#0.00"/>
+                                      </h:outputLabel>  -->
+                                   </f:facet>
+                                
+                                
+                              </p:column>
+
+
+
+
+                              <p:column sortBy="#{object.totaleMalattia}" id="tot-malattia" style="text-align:center">
+                                  <f:facet name="header">
+                                        <h:outputText value="Totale Malattia (HH/gg)" />
+                                  </f:facet>
+                                  
+                                  
+                                  <h:outputText value="#{object.totaleMalattia}" rendered="#{object.totaleMalattia != null and object.totaleMalattia != 0}" />
+                                  <h:outputText value=" / " rendered="#{object.totaleMalattia != null and object.totaleMalattia != 0}"/>
+                                  <h:outputText value="#{object.totaleMalattia/8}" rendered="#{object.totaleMalattia != null and object.totaleMalattia != 0}"> 
+                                      <f:convertNumber pattern="#0.00"/>
+                                  </h:outputText>
+                                  
+                                  
+                                  
+                                  <f:facet name="footer">
+                                  <h:outputLabel value="#{visualizzaRegistrazioneBean.footerTotaleMalattia} / #{visualizzaRegistrazioneBean.footerTotaleMalattia/8}"/>
+                                  </f:facet>
+                                  <!-- rendered="#{visualizzaRegistrazioneBean.footerTotaleMalattia != null and visualizzaRegistrazioneBean.footerTotaleMalattia != 0}" -->
+                                 <!--   <f:facet name="footer">
+                                       <h:outputLabel value="#{visualizzaRegistrazioneBean.footerTotaleMalattia} / #{visualizzaRegistrazioneBean.footerTotaleMalattia/8}" >
+                                        <f:convertNumber pattern="#0.00"/>
+                                       </h:outputLabel>  -->
+                                   <!--  <h:outputLabel value=" / "   />
+                                     
+                                      <h:outputLabel value="#{}" > 
+                                         <f:convertNumber pattern="#0.00"/>
+                                      </h:outputLabel>  -->
+                                       
+                                      
+                                <!-- </f:facet> -->
+                              </p:column>
+
+
+
+
+
+                              <p:column sortBy="#{object.totaleTrasferta}" id="tot-trasferta" style="text-align:center">
+                                  <f:facet name="header">
+                                       <h:outputText value="Totale Trasferta (HH/gg)" />
+                                  </f:facet>
+                                  
+                                  
+                                  <h:outputText value="#{object.totaleTrasferta}" rendered="#{object.totaleTrasferta != null and object.totaleTrasferta != 0}" />
+                                  <h:outputText value=" / " rendered="#{object.totaleTrasferta != null and object.totaleTrasferta != 0}"/>
+                                  <h:outputText value="#{object.totaleTrasferta/8}" rendered="#{object.totaleTrasferta != null and object.totaleTrasferta != 0}"> 
+                                      <f:convertNumber pattern="#0.00"/>
+                                  </h:outputText>
+                                  
+                                  
+                                   <f:facet name="footer">
+                                   <h:outputLabel value="#{visualizzaRegistrazioneBean.footerTotaleTrasferta} / #{visualizzaRegistrazioneBean.footerTotaleTrasferta/8}"/>
+                                   
+                                      <!-- <h:outputLabel value="#{visualizzaRegistrazioneBean.footerTotaleTrasferta} / #{visualizzaRegistrazioneBean.footerTotaleTrasferta/8}"  
+                                      rendered="#{visualizzaRegistrazioneBean.footerTotaleTrasferta != null and visualizzaRegistrazioneBean.footerTotaleTrasferta != 0}" /> -->
+                                      <!-- <h:outputLabel value=" / " rendered="#{visualizzaRegistrazioneBean.footerTotaleTrasferta != null and visualizzaRegistrazioneBean.footerTotaleTrasferta != 0}" />
+                                      
+                                      <h:outputLabel value="#{visualizzaRegistrazioneBean.footerTotaleTrasferta/8}" rendered="#{visualizzaRegistrazioneBean.footerTotaleMalattia != null and visualizzaRegistrazioneBean.footerTotaleTrasferta != 0}"> 
+                                         <f:convertNumber pattern="#0.00"/>
+                                      </h:outputLabel> -->
+                                      
+                                </f:facet>
+                              </p:column>
+                              
+                              
+                              
+                              
+                              <p:column sortBy="#{object.totale}" id="tot" style="text-align:center">
+                                  <f:facet name="header">
+                                        <h:outputText value="Totale (HH/gg)" />
+                                  </f:facet>
+                                  
+                                  <h:outputText value="#{object.totale} " rendered="#{object.totale != null and object.totale != 0}" />
+                                  <h:outputText value=" / " rendered="#{object.totale != null and object.totale != 0}"/>
+                                  <h:outputText value=" #{object.totale/8}" rendered="#{object.totale != null and object.totale != 0}"> 
+                                      <f:convertNumber pattern="#0.00"/>
+                                  </h:outputText>
+                                  
+                                  
+                                   <f:facet name="footer">
+                                   <h:outputLabel value="#{visualizzaRegistrazioneBean.footerTotaleTotali} / #{visualizzaRegistrazioneBean.footerTotaleTotali/8}"/>
+                                   
+                                      <!-- <h:outputLabel value="#{visualizzaRegistrazioneBean.footerTotaleTotali} / #{visualizzaRegistrazioneBean.footerTotaleTotali/8}" 
+                                      rendered="#{visualizzaRegistrazioneBean.footerTotaleTotali != null and visualizzaRegistrazioneBean.footerTotaleTotali != 0}" /> -->
+                                      <!-- <h:outputLabel value=" / " rendered="#{visualizzaRegistrazioneBean.footerTotaleTotali != null and visualizzaRegistrazioneBean.footerTotaleTotali != 0}" />
+                                      <h:outputLabel value="#{visualizzaRegistrazioneBean.footerTotaleTotali/8}" rendered="#{visualizzaRegistrazioneBean.footerTotaleTotali != null and visualizzaRegistrazioneBean.footerTotaleTotali != 0}"> 
+                                         <f:convertNumber pattern="#0.00"/>
+                                      </h:outputLabel> -->
+                                  </f:facet>
+                              </p:column>
+                                
+                                
+
+						    </p:dataTable>
+						    
+						    
+						  
+						</div>  
+						    
+				</h:form>
+						
+                 
+                  
+                  
+   
+    <h:form id="form3">
+    
+      <p:dialog header="Dettaglio" widgetVar="showRegistrazDialog" modal="true" closeOnEscape="true"
+      showEffect="clip" hideEffect="clip" resizable="false" style="width: auto; height: auto;" dynamic="true">
+      
+               <div class="table-responsive"> 
+							<p:dataTable var="modale" 
+							    styleClass="et_datatable table-striped"
+							    id="tabella_dialogo"
+							    stickyHeader="true" 
+								value="#{visualizzaRegistrazioneBean.dialogRegistrazioni}"
+								emptyMessage="Nessuna registrazione trovata" paginator="true" rows="25"
+								editable="true"
+								
+								rowKey="#{modale.codice}"
+								rowsPerPageTemplate="10,25,30,40,50"
+
+								style="width:auto; table-layout: auto;"
+								paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+								filteredValue="#{visualizzaRegistrazioneBean.filteredDialogRegistrazione}">
+							
+							
+							<f:facet name="header">
+                                   Elenco Registrazioni
+                            </f:facet>
+							
+							
+							<p:column filterBy="#{modale.cognome}" filterMatchMode="contains"
+                              sortBy="#{modale.cognome}" id="surname" rendered="#{request.isUserInRole('ROLE_ADMIN') or request.isUserInRole('ROLE_SUPERUSER')}">
+                                  <f:facet name="header">
+                                       <h:outputText value="Cognome" />
+                                  </f:facet>
+                                  <h:outputText value="#{modale.cognome}">
+                                  </h:outputText>
+                            </p:column>
+                            
+                            
+                            <p:column filterBy="#{modale.nome}" filterMatchMode="contains"
+                              sortBy="#{modale.nome}" id="name" rendered="#{request.isUserInRole('ROLE_ADMIN') or request.isUserInRole('ROLE_SUPERUSER')}">
+                                  <f:facet name="header">
+                                       <h:outputText value="Nome" />
+                                  </f:facet>
+                                  <h:outputText value="#{modale.nome}">
+                                  </h:outputText>
+                            </p:column>
+							
+                            
+                            
+                            <p:column filterBy="#{modale.data}" filterMatchMode="contains"
+                              sortBy="#{modale.data}" id="data">
+                                  <f:facet name="header">
+                                       <h:outputText value="Data" />
+                                  </f:facet>
+                                  <h:outputText value="#{modale.data}">
+                                     <f:convertDateTime pattern="dd/MM/yyyy" />
+                                  </h:outputText>
+                            </p:column>
+                            
+                            
+                            
+                            <p:column filterBy="#{modale.lavorate}" filterMatchMode="contains"
+                              sortBy="#{modale.lavorate}" id="modal-lavorate">
+                                  <f:facet name="header">
+                                       <h:outputText value="Lavorate" />
+                                  </f:facet>
+                                  <h:outputText value="#{modale.lavorate}" 
+                                  rendered="#{modale.lavorate != null and modale.lavorate != 0}" />
+                            </p:column>
+                            
+                            
+                             <p:column filterBy="#{modale.ferie}" filterMatchMode="contains"
+                              sortBy="#{modale.ferie}" id="modal-ferie">
+                                  <f:facet name="header">
+                                       <h:outputText value="Ferie" />
+                                  </f:facet>
+                                  <h:outputText value="#{modale.ferie}" 
+                                  rendered="#{modale.ferie != null and modale.ferie != 0}"/>
+                            </p:column>
+                              
+                              
+                            
+                             <p:column filterBy="#{modale.permesso}" filterMatchMode="contains"
+                              sortBy="#{modale.permesso}" id="modal-permesso">
+                                  <f:facet name="header">
+                                       <h:outputText value="Permesso" />
+                                  </f:facet>
+                                  <h:outputText value="#{modale.permesso}" 
+                                  rendered="#{modale.permesso != null and modale.permesso != 0}" />
+                            </p:column>
+                            
+                            
+                             <p:column filterBy="#{modale.malattia}" filterMatchMode="contains"
+                              sortBy="#{modale.lavorate}" id="modal-malattia">
+                                  <f:facet name="header">
+                                       <h:outputText value="Malattia" />
+                                  </f:facet>
+                                  <h:outputText value="#{modale.malattia}" 
+                                  rendered="#{modale.malattia != null and modale.malattia != 0}" />
+                            </p:column>
+                            
+                            
+                            
+                            <p:column filterBy="#{modale.trasferta}" filterMatchMode="contains"
+                              sortBy="#{modale.trasferta}" id="modal-trasferta">
+                                  <f:facet name="header">
+                                       <h:outputText value="Trasferta" />
+                                  </f:facet>
+                                  <h:outputText value="#{modale.trasferta}" 
+                                  rendered="#{modale.trasferta != null and modale.trasferta != 0}"/>
+                            </p:column>
+                            
+				        </p:dataTable>
+			    </div>
+			    
+
+<p:panel header="Esporta la Tabella" style="margin-top: 10px;">
+
+    <h:commandLink id="xls">
+        <p:graphicImage url="/resources/imgs/excel.png" alt="xls" title="Esporta in XLS"/>
+        <p:dataExporter type="xls" target=":form3:tabella_dialogo" fileName="dettaglio_registrazioni" 
+        encoding="UTF-8" postProcessor="#{exporterBean.postProcessXLS}"/>
+    </h:commandLink>
+    
+    <p:spacer width="20"/> 
+ 
+    <h:commandLink id="pdf">
+        <p:graphicImage url="/resources/imgs/pdf.png" alt="pdf" title="Esporta in PDF"/>
+        <p:dataExporter type="pdf" target=":form3:tabella_dialogo" fileName="dettaglio_registrazioni"
+         encoding="UTF-8" preProcessor="#{exporterBean.preProcessPDF}"/>
+    </h:commandLink>
+    
+    <p:spacer width="20"/> 
+ 
+    <h:commandLink id="csv">
+        <p:graphicImage url="/resources/imgs/csv.png" alt="csv" title="Esporta in CSV"/>
+        <p:dataExporter type="csv" target=":form3:tabella_dialogo" fileName="dettaglio_registrazioni" encoding="UTF-8"/>
+    </h:commandLink>
+    
+    <p:spacer width="20"/> 
+ 
+    <h:commandLink id="xml">
+        <p:graphicImage url="/resources/imgs/xml.png" alt="xml" title="Esporta in XML"/>
+        <p:dataExporter type="xml" target=":form3:tabella_dialogo" fileName="dettaglio_registrazioni" encoding="UTF-8"/>
+    </h:commandLink>
+    
+ </p:panel>
+ 
+                
+      </p:dialog>  
+          
+   </h:form>  
+                    
+   
+   
+                    
+
+
+
+<h:form id="form4">
+
+<p:panel header="Esporta la Tabella" style="margin-top: 10px;">
+
+    <h:commandLink id="xls">
+        <p:graphicImage url="/resources/imgs/excel.png" alt="xls" title="Esporta in XLS"/>
+        <p:dataExporter type="xls" target=":form2:tabella_visualizza" fileName="elenco_registrazioni" 
+        encoding="UTF-8" postProcessor="#{exporterBean.postProcessXLS}"/>
+    </h:commandLink>
+    
+    <p:spacer width="20"/> 
+ 
+    <h:commandLink id="pdf">
+        <p:graphicImage url="/resources/imgs/pdf.png" alt="pdf" title="Esporta in PDF"/>
+        <p:dataExporter type="pdf" target=":form2:tabella_visualizza" fileName="elenco_registrazioni"
+         encoding="UTF-8" preProcessor="#{exporterBean.preProcessVisualizzaRegistrazionePDF}"/>
+    </h:commandLink>
+    
+    <p:spacer width="20"/> 
+ 
+    <h:commandLink id="csv">
+        <p:graphicImage url="/resources/imgs/csv.png" alt="csv" title="Esporta in CSV"/>
+        <p:dataExporter type="csv" target=":form2:tabella_visualizza" fileName="elenco_registrazioni" encoding="UTF-8"/>
+    </h:commandLink>
+    
+    <p:spacer width="20"/> 
+ 
+    <h:commandLink id="xml">
+        <p:graphicImage url="/resources/imgs/xml.png" alt="xml" title="Esporta in XML"/>
+        <p:dataExporter type="xml" target=":form2:tabella_visualizza" fileName="elenco_registrazioni" encoding="UTF-8"/>
+    </h:commandLink>
+    
+</p:panel>
+
+</h:form>
+
+
+</ui:define>
+</ui:composition>

@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans:beans 
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:sec="http://www.springframework.org/schema/security"
+    xmlns:util="http://www.springframework.org/schema/util"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+    xmlns:beans="http://www.springframework.org/schema/beans"
+    xsi:schemaLocation="
+    http://www.springframework.org/schema/util 
+    http://www.springframework.org/schema/util/spring-util-3.1.xsd
+    http://www.springframework.org/schema/beans
+    http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+    http://www.springframework.org/schema/security
+    http://www.springframework.org/schema/security/spring-security-3.1.xsd
+    http://www.springframework.org/schema/context 
+    http://www.springframework.org/schema/context/spring-context-3.1.xsd">
+
+
+
+    <!-- Scan for all of Spring components such as Spring Service -->
+    <context:annotation-config />
+	<context:component-scan base-package="it.conselti" />
+
+
+
+
+<!-- 
+    SPRING SECURITY CONFIGURATION
+	resource security 
+	
+	Note: 
+	Access-denied-page is invoked when user is AUTHENTICATED but is not AUTHORIZED to access protected resources.
+	When user is NOT AUTHENTICATED, he is moved into form-login instead of access-denied-page.
+-->
+	
+	
+	
+	<!-- 
+	business logic (method) security 
+	-->
+	<sec:global-method-security pre-post-annotations="enabled" 
+	secured-annotations="enabled" jsr250-annotations="enabled"/>
+	
+	<sec:http security="none" pattern="/javax.faces.resource/**" />
+    <sec:http security="none" pattern="/resources/**" />
+    <sec:http security="none" pattern="/templates/**" />
+    <sec:http security="none" pattern="/headers/**" />
+    
+	
+	
+	<sec:http auto-config="true" use-expressions="true" access-denied-page="/access-denied.xhtml">
+	<!-- page level security -->
+	    <sec:intercept-url pattern="/index.xhtml" access="permitAll()" />
+	    <sec:intercept-url pattern="/login.xhtml" access="permitAll()" />
+	    <sec:intercept-url pattern="/logout.xhtml" access="permitAll()" />
+		<sec:intercept-url pattern="/inserimento-anagrafica.xhtml" access="hasRole('ROLE_ADMIN')" />
+		<sec:intercept-url pattern="/**" access="isAuthenticated()" />
+		
+		
+		<sec:form-login login-page="/login.xhtml" default-target-url="/welcome.xhtml"
+		authentication-failure-url="/login.xhtml?error=true" always-use-default-target="true"/>
+		
+		<sec:logout invalidate-session="true" delete-cookies="true" logout-success-url="/logout.xhtml"/> 
+	</sec:http>
+		
+		
+		
+	<!-- 
+	manager responsible for loading user account with assigned roles:
+	
+	<sec:authentication-provider user-service-ref="userDetailsService">
+	</sec:authentication-provider>
+	
+	
+	<sec:authentication-provider>
+		     <sec:jdbc-user-service data-source-ref="dataSource"
+                users-by-username-query="OPEN SYMMETRIC KEY Psw_usrs_Key01 DECRYPTION BY CERTIFICATE Users_password_AES256 
+                SELECT Username, CONVERT(nvarchar, DecryptByKey(Password_Encrypted, 1, HashBytes('SHA1', CONVERT(varbinary, Codice_utente)))) AS Password, Enabled
+                FROM _Utente WHERE Username = ?"
+                
+                authorities-by-username-query="SELECT Username, NomeRuolo FROM _Utente AS ut INNER JOIN _assegna AS ass ON 
+                ut.Codice_utente = ass.Matr_utente INNER JOIN _Ruolo AS ru ON ass.Matr_ruolo = ru.CodiceRuolo WHERE ass.Matr_ruolo = ru.CodiceRuolo AND ut.Username = ?" />
+	</sec:authentication-provider>
+	-->
+	
+	<sec:authentication-manager alias="authenticationManager">
+	      <sec:authentication-provider>
+		  
+		     <sec:jdbc-user-service data-source-ref="dataSource"
+                users-by-username-query="OPEN SYMMETRIC KEY Psw_usrs_Key01 DECRYPTION BY CERTIFICATE Users_password_AES256 
+                SELECT Username, CONVERT(nvarchar, DecryptByKey(Password_Encrypted, 1, HashBytes('SHA1', CONVERT(varbinary, Codice_utente)))) AS Password, Enabled
+                FROM _Utente WHERE Username = ?"
+                
+                authorities-by-username-query="SELECT Username, NomeRuolo FROM _Utente AS ut INNER JOIN _assegna AS ass ON 
+                ut.Codice_utente = ass.Matr_utente INNER JOIN _Ruolo AS ru ON ass.Matr_ruolo = ru.CodiceRuolo WHERE ass.Matr_ruolo = ru.CodiceRuolo AND ut.Username = ?" />
+	      
+	      </sec:authentication-provider>
+	</sec:authentication-manager>
+	
+	
+</beans:beans>

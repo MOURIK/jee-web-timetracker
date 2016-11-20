@@ -1,0 +1,194 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	template="/templates/main-template.xhtml">
+    
+    
+		
+
+	<ui:define name="content">
+   
+	
+					 
+			<h:form id="form1">	
+				 
+				  <p:growl id="growl" sticky="false" showDetail="true" life="2000" /> 
+				  
+				  
+				  
+				  <p:idleMonitor timeout="300000">
+                      <p:ajax event="idle" listener="#{headerBean.onIdle}" update=":form1:growl" />
+                      <p:ajax event="active" listener="#{headerBean.onActive}" update=":form1:growl" />
+                  </p:idleMonitor>
+                
+                
+				  
+				       <p:panel header="Inserimento Anagrafica" id="panel">
+						 
+						 <br/>
+						 
+							<h:panelGrid id="view" columns="3" cellpadding="4">
+
+							       <h:outputText for="ruolo" value="Ruolo Utente " style="padding-left: 30px; padding-right: 30px;"/>
+									<p:selectOneMenu id="ruolo" style="width:180px"
+										value="#{anagraficaBean.assegna.matricolaRuolo}"
+									    required="true" requiredMessage="Ruolo obbligatorio">
+										<f:selectItem itemLabel="Seleziona Ruolo" itemValue=""
+											noSelectionOption="true" />
+										<f:selectItems value="#{dropdownBean.ruoloMap.entrySet()}"
+											var="item" itemLabel="#{item.value}" itemValue="#{item.key}"/>
+									</p:selectOneMenu>
+									<p:message for="ruolo" autoUpdate="true"/>
+							
+							
+							        <h:outputText value="Username " for="username" style="padding-left: 30px; padding-right: 30px;"/>
+									<p:inputText value="#{anagraficaBean.utente.usernameUtente}" required="true" requiredMessage="Username obbligatorio"
+									id="username">
+									      <f:validateLength minimum="2" />
+									</p:inputText>
+									<p:message for="username" autoUpdate="true"/>
+									
+									
+									
+									<h:outputText value="Password " for="pwd1" style="padding-left: 30px; padding-right: 30px;"/>
+									<p:inputText id="pwd1" value="#{anagraficaBean.utente.passwordUtente}" required="true" requiredMessage="Password obbligatoria">
+									    <f:validateLength minimum="2" />
+									</p:inputText>
+									<p:message for="pwd1" autoUpdate="true"/>
+									
+									
+									
+									<h:outputLabel value="Abilitato " for="enabled" style="padding-left: 30px; padding-right: 30px;"/>
+									<p:selectOneRadio id="enabled" value="#{anagraficaBean.utente.enabled}" required="true" requiredMessage="Abilitato obbligatorio">
+                                         <f:selectItem itemLabel="Si" itemValue="true" />
+                                         <f:selectItem itemLabel="No" itemValue="false" />
+                                    </p:selectOneRadio>
+									<p:message for="enabled" autoUpdate="true"/>
+									
+									
+									
+									<h:outputText value="Codice Fiscale " for="cf" style="padding-left: 30px; padding-right: 30px;"/>
+									<p:inputMask value="#{anagraficaBean.anagrafica.codiceFiscale}" required="true" requiredMessage="Codice Fiscale obbligatorio"
+									id="cf" mask="****************">
+									</p:inputMask>
+									<p:message for="cf" autoUpdate="true"/> 
+									
+									
+									
+									<h:outputText value="Nome " for="name" style="padding-left: 30px; padding-right: 30px;"/>
+									<p:inputText value="#{anagraficaBean.anagrafica.nome}" required="true" id="name" requiredMessage="Nome obbligatorio">
+									    <f:validateLength minimum="2" />
+									</p:inputText>
+									<p:message for="name" autoUpdate="true"/>
+									
+									
+									
+									<h:outputText value="Cognome " for="surname" style="padding-left: 30px; padding-right: 30px;"/>
+									<p:inputText value="#{anagraficaBean.anagrafica.cognome}" required="true" id="surname" requiredMessage="Cognome obbligatorio">
+									    <f:validateLength minimum="2" />
+									</p:inputText>
+									<p:message for="surname" autoUpdate="true"/>
+									
+									
+									
+								
+									<h:outputText value="Sesso " for="sex" style="padding-left: 30px; padding-right: 30px;"/>
+									<p:selectOneRadio id="sex" value="#{anagraficaBean.anagrafica.sesso}">
+                                         <f:selectItem itemLabel="Maschio" itemValue="M" />
+                                         <f:selectItem itemLabel="Femmina" itemValue="F" />
+                                    </p:selectOneRadio>
+                                    <p:message for="sex" autoUpdate="true"/>
+
+									
+									
+									<h:outputText for="dataNascita" value="Data di Nascita " style="padding-left: 30px; padding-right: 30px;" />
+                                    <p:calendar value="#{anagraficaBean.anagrafica.nascita}" locale="it" required="true" navigator="true" pattern="dd/MM/yyyy" 
+                                    mask="99/99/9999" label="Data di Nascita" id="dataNascita"  yearRange="c-100:c+100" requiredMessage="Data Nascita obbligatoria"> 
+                                    </p:calendar>
+                                    <p:message for="dataNascita" autoUpdate="true"/>
+									
+                                 
+									
+									<h:outputText for="email" value="Email " style="padding-left: 30px; padding-right: 30px;"/>
+									<p:inputText id="email" value="#{anagraficaBean.anagrafica.email}" validatorMessage="L'email non ha caratteri validi"  
+									label="Email" required="true" requiredMessage="Email obbligatoria">
+									    <f:validateRegex pattern="[\w\.-]*[a-zA-Z0-9_]@[\w\.-]*[a-zA-Z0-9]\.[a-zA-Z][a-zA-Z\.]*[a-zA-Z]" />
+									</p:inputText>
+									<p:message for="email" autoUpdate="true"/>
+									
+
+
+									
+									<h:outputText value="Via " for="via" style="padding-left: 30px; padding-right: 30px;"/>
+									<p:inputText value="#{anagraficaBean.anagrafica.via}" id="via">
+										   <f:validateLength minimum="2" />
+								     </p:inputText>
+								     <p:message for="via" autoUpdate="true"/>
+										
+
+									
+									<h:outputText value="CAP " for="cap" style="padding-left: 30px; padding-right: 30px;"/>
+									<p:inputMask value="#{anagraficaBean.anagrafica.cap}" mask="99999" id="cap">
+									     <f:validateLength minimum="2" />
+									</p:inputMask>
+									<p:message for="cap" autoUpdate="true"/>
+
+
+									
+									<h:outputText value="Città " for="city" style="padding-left: 30px; padding-right: 30px;"/>
+									<p:inputText value="#{anagraficaBean.anagrafica.city}" id="city" 
+									required="true" requiredMessage="Città obbligatoria">
+										 <f:validateLength minimum="2" />
+								    </p:inputText>
+									<p:message for="city" autoUpdate="true"/>
+										
+
+
+									
+									<h:outputText value="Telefono " for="cell" style="padding-left: 30px; padding-right: 30px;"/>
+									<p:inputMask value="#{anagraficaBean.anagrafica.cellulare}" mask="(999) 999-9999" id="cell">
+									      <f:validateLength minimum="2" />
+									</p:inputMask>
+                            		<p:message for="cell" autoUpdate="true"/>
+                            		
+						</h:panelGrid>
+						
+						    <h:panelGrid columns="2" cellpadding="4" >	
+								
+								
+								 <p:outputPanel layout="block" style="text-align:center">
+							       <br />
+							       <br />
+									
+									<p:commandButton value="Reset" process="@this" actionListener="#{registrazioneBean.reset}"
+									icon="ui-icon-close" update=":form1:panel" style="margin-left:30px;">
+									</p:commandButton>
+									
+									
+									<p:spacer width="10"/> 
+									
+									<p:commandButton value="#{i18n.salva}" icon="ui-icon-disk"
+										actionListener="#{anagraficaBean.inserisciAnagrafica}" 
+										update=":form1:panel, :form1:growl"
+										validateClient="true" type="submit">
+							        </p:commandButton>
+							     
+							     
+							     </p:outputPanel>
+							     
+							     
+							 </h:panelGrid>
+					  
+				 </p:panel>			 
+		</h:form>	 
+					  
+					
+	
+
+              
+	</ui:define>
+</ui:composition>

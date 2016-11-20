@@ -1,0 +1,26 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui">
+
+
+		<h:form id="menubar">
+
+		          <p:menubar id="dynamic" model="#{menubarBean.model}" style="box-shadow: 5px 4px 5px #e4e4e4;">
+		              <f:facet name="options">
+                           <p:commandButton actionListener="#{headerBean.effettuaLogout}" 
+                           value="Logout" icon="ui-icon-extlink" />
+                      </f:facet>
+		          </p:menubar>
+		             
+		             
+		     <p:menubar autoDisplay="false" style="box-shadow: 5px 4px 5px #e4e4e4;">
+             </p:menubar>       
+		             
+	    
+       </h:form>
+		
+</ui:composition>

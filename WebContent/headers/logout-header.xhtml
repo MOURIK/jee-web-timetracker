@@ -1,0 +1,37 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui">
+
+
+	<h:form id="form-logout">
+	
+	   <p:growl id="growl" showDetail="true" sticky="false" life="2000"/>
+	
+		<p:menubar style="box-shadow: 5px 4px 5px #e4e4e4;">
+		
+		  <p:menuitem>
+             <p:graphicImage url="/resources/imgs/logo.png" height="40" style="padding-left: 8px;" alt="Conselti" title="Conselti"/>
+		   </p:menuitem>
+		  
+		  <f:facet name="options">
+			<p:commandButton style="margin-top: 4px;" value="Help" icon="ui-icon-help" 
+			actionListener="#{headerBean.helpLogout}" update=":form-logout:growl"/> 
+		  </f:facet>	  
+		     
+		</p:menubar>
+
+
+ 
+		<p:menubar autoDisplay="false" style="box-shadow: 5px 4px 5px #e4e4e4;">
+        //same content as default menubar
+      </p:menubar>
+   </h:form>
+
+
+
+
+</ui:composition>

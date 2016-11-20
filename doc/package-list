@@ -1,0 +1,10 @@
+it.conselti.application
+it.conselti.application.impl
+it.conselti.domain
+it.conselti.extra.scope
+it.conselti.managedBean
+it.conselti.provider
+it.conselti.repository
+it.conselti.service
+test
+test.mockito
